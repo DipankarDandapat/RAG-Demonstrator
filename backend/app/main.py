@@ -248,20 +248,6 @@ Rules:
 # Assembles evidence context, builds grounded prompt, calls OpenAI to generate answer
 NOT_IN_KB = "This answer is not available in the knowledge base."
 
-def _is_grounded(answer: str, sources: list[dict[str, Any]]) -> bool:
-    """Check if any meaningful content from sources appears in the answer."""
-    if not sources:
-        return False
-    answer_lower = answer.lower()
-    for s in sources:
-        # take key phrases (4+ word sequences) from each chunk
-        words = s["text"].lower().split()
-        for i in range(len(words) - 3):
-            phrase = " ".join(words[i:i+4])
-            if phrase in answer_lower:
-                return True
-    return False
-
 def generate_answer(question: str, sources: list[dict[str, Any]], prior_turns: list[dict[str, str]] | None = None) -> tuple[str, str]:
     context = "\n\n".join(f"[{i+1}] (source: {s['metadata'].get('title', s['metadata'].get('source'))})\n{s['text']}" for i, s in enumerate(sources))
     if not os.getenv("OPENAI_API_KEY"):
@@ -276,11 +262,6 @@ def generate_answer(question: str, sources: list[dict[str, Any]], prior_turns: l
     messages.append({"role": "user", "content": f"Evidence:\n{context}\n\nQuestion: {question}"})
     response = llm.chat.completions.create(model=model, messages=messages, temperature=0.1, max_tokens=900)
     answer = response.choices[0].message.content or "No answer returned."
-    # if not grounded in evidence, return the standard not-in-kb message (no fake citations)
-    if not _is_grounded(answer, sources):
-        return NOT_IN_KB, "openai"
-    # strip any stray [N] citations that reference non-existent chunks
-    answer = re.sub(r"\[\d+\]", "", answer).strip()
     return answer, "openai"
 
 # ── Step 10: Knowledge base ready ────────────────────────────────────────────
@@ -415,7 +396,7 @@ def feedback(req: FeedbackRequest):
     item = req.model_dump(); item["created_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ"); _feedback.append(item)
     # also persist rating onto the matching history row
     with _get_db() as con:
-        con.execute("UPDATE history SET feedback=? WHERE question=? ORDER BY created_at DESC LIMIT 1",
+        con.execute("UPDATE history SET feedback=? WHERE id=(SELECT id FROM history WHERE question=? ORDER BY created_at DESC LIMIT 1)",
                     (req.rating, req.question))
     return {"saved": True, "feedback_count": len(_feedback), "message": "Feedback captured for prompt, retrieval, and test-coverage improvement."}
 

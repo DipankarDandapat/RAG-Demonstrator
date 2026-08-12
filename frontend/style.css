@@ -298,19 +298,20 @@ body { margin: 0; }
 .source-body p { font-size: .875rem; margin: 3px 0; color: #6B7280; line-height: 1.4; }
 .source-body small { color: #6B7280; font-size: .75rem; }
 
-/* ── Feedback ── */
-.feedback {
-  display: flex; align-items: center; gap: 8px;
-  margin-top: 14px; font-size: .875rem; color: #6B7280;
-  flex-wrap: wrap;
+/* ── Inline Feedback ── */
+.inline-feedback {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+  font-size: .8rem; color: #6B7280;
 }
-.feedback button {
+.fb-btn {
   border: 1px solid #e2e8f0; border-radius: 8px;
-  padding: 6px 14px; min-height: 36px; font-weight: 500; cursor: pointer;
-  background: #f8fafc; color: #6B7280; font: inherit; font-size: .875rem;
+  padding: 5px 12px; min-height: 32px; font-weight: 500; cursor: pointer;
+  background: #f8fafc; color: #6B7280; font: inherit; font-size: .8rem;
   transition: all .15s;
 }
-.feedback button:hover { background: #1e4ed8; color: white; border-color: #1e4ed8; }
+.fb-btn:hover { background: #1e4ed8; color: white; border-color: #1e4ed8; }
 
 /* ── Ingest panel ── */
 .drop {

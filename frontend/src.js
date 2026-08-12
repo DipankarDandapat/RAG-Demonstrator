@@ -395,6 +395,13 @@ function renderThread() {
             </div>
           </div>`).join('')}
       </details>` : '';
+    const fbHtml = turn.feedback
+      ? `<div class="inline-feedback"><span>✅ Feedback saved — thank you!</span></div>`
+      : `<div class="inline-feedback" data-turn="${i}">
+          <span>Was this answer useful?</span>
+          <button class="fb-btn" data-turn="${i}" data-rating="helpful">👍 Helpful</button>
+          <button class="fb-btn" data-turn="${i}" data-rating="not_helpful">👎 Needs work</button>
+        </div>`;
     return `
       <div class="chat-turn" data-turn="${i}">
         <div class="chat-bubble chat-bubble-user">${esc(turn.question)}</div>
@@ -406,6 +413,7 @@ function renderThread() {
           </div>
           <div class="chat-answer-body">${renderMarkdown(d.answer)}</div>
           ${sourcesHtml}
+          ${fbHtml}
         </div>
       </div>`;
   }).join('');
@@ -468,11 +476,7 @@ async function sendQuestion() {
     setStep(18, 'done', `Confidence ${(data.confidence * 100).toFixed(0)}% · ${data.timing_ms.total} ms`);
     setStep(19, 'done', `${data.sources.length} citations attached`);
     setStep(20, 'idle', 'Awaiting your feedback…');
-
     renderThread();
-    const fb = document.querySelector('#feedback');
-    fb.classList.remove('hidden');
-    fb.innerHTML = '<span>Was this answer useful?</span><button data-rating="helpful">👍 Helpful</button><button data-rating="not_helpful">👎 Needs work</button>';
   } catch (e) {
     // remove pending bubble and show error
     document.querySelector('.chat-turn-pending')?.remove();
@@ -494,17 +498,23 @@ document.querySelector('#question').addEventListener('keydown', e => {
 });
 
 /* ── Feedback ── */
-document.querySelector('#feedback').onclick = async e => {
-  if (!e.target.dataset.rating || !state.queryResult) return;
-  const lastTurn = state.turns[state.turns.length - 1];
+document.querySelector('#chatThread').addEventListener('click', async e => {
+  const btn = e.target.closest('.fb-btn');
+  if (!btn) return;
+  const turnIdx = parseInt(btn.dataset.turn, 10);
+  const turn = state.turns[turnIdx];
+  if (!turn) return;
   await api('/feedback', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question: lastTurn?.question || '', answer: state.queryResult.answer, rating: e.target.dataset.rating })
+    body: JSON.stringify({ question: turn.question, answer: turn.data.answer, rating: btn.dataset.rating })
   });
-  setStep(20, 'done', `Feedback: ${e.target.dataset.rating}`);
-  e.target.parentElement.innerHTML = '<span>✅ Feedback saved — thank you!</span>';
+  turn.feedback = btn.dataset.rating;
+  setStep(20, 'done', `Feedback: ${btn.dataset.rating}`);
+  // replace just the feedback row without full re-render
+  const fbDiv = document.querySelector(`.inline-feedback[data-turn="${turnIdx}"]`);
+  if (fbDiv) fbDiv.outerHTML = `<div class="inline-feedback"><span>✅ Feedback saved — thank you!</span></div>`;
   refresh();
-};
+});
 
 function showError(e, target = null) {
   if (!target) { console.error(e.message); return; }
@@ -584,9 +594,7 @@ document.querySelector('#histList').addEventListener('click', async e => {
   state.turns = [{ question: h.question, data: h }];
   state.queryResult = h;
   renderThread();
-  const fb = document.querySelector('#feedback');
-  fb.classList.remove('hidden');
-  fb.innerHTML = '<span>Was this answer useful?</span><button data-rating="helpful">👍 Helpful</button><button data-rating="not_helpful">👎 Needs work</button>';
+  renderThread();
   closeHistory();
 });
 
