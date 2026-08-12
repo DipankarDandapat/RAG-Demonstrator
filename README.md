@@ -25,10 +25,10 @@ A fully working, end-to-end RAG system that lets you upload any document, ask na
 
 ### Demo Video
 
-<video src="doc/RAGDemonstrator.webm" controls width="100%">
-  <a href="doc/RAGDemonstrator.webm">▶ Watch Demo Video</a>
+<video controls width="100%">
+  <source src="https://raw.githubusercontent.com/DipankarDandapat/RAG-Demonstrator/master/doc/RAGDemonstrator.webm" type="video/webm">
+  Your browser does not support the video tag.
 </video>
-
 ---
 
 ## What We Built
