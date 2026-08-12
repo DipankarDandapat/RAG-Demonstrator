@@ -25,7 +25,7 @@ A fully working, end-to-end RAG system that lets you upload any document, ask na
 
 ### Demo Video
 
-<video src="doc/RAG Demonstrator.webm" controls width="100%">
+<video src="doc/RAGDemonstrator.webm" controls width="100%">
   <a href="doc/RAGDemonstrator.webm">▶ Watch Demo Video</a>
 </video>
 
