@@ -17,6 +17,20 @@ A fully working, end-to-end RAG system that lets you upload any document, ask na
 
 ---
 
+## Demo
+
+### Project Screenshot
+
+![RAG Demonstrator Home](doc/project_image.png)
+
+### Demo Video
+
+<video src="doc/RAG Demonstrator.webm" controls width="100%">
+  <a href="doc/RAG Demonstrator.webm">▶ Watch Demo Video</a>
+</video>
+
+---
+
 ## What We Built
 
 Most AI chat tools hallucinate because they rely purely on model memory. We built this demonstrator to show a better approach: **Retrieval-Augmented Generation (RAG)** — where every answer is grounded in documents you provide, with citations pointing back to the exact source chunk.
