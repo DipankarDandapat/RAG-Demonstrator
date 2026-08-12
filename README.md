@@ -396,13 +396,6 @@ This project is a demonstrator. Before using in production:
 - Confirm `FRONTEND_ORIGIN=http://localhost:5173` in `backend/.env`
 - Confirm the backend is running on port 8000
 
----
-
-## License
-
-MIT — free to use, modify, and distribute.
-
----
 
 <div align="center">
 
